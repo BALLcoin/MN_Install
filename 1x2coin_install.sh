@@ -1,14 +1,14 @@
 #!/bin/bash
 
 TMP_FOLDER=$(mktemp -d)
-CONFIG_FILE="lunarium.conf"
-LUNARIUM_DAEMON="/usr/local/bin/lunariumd"
-LUNARIUM_CLI="/usr/local/bin/lunarium-cli"
-LUNARIUM_REPO="https://github.com/LunariumCoin/lunarium.git"
-LUNARIUM_LATEST_RELEASE="https://github.com/LunariumCoin/lunarium/releases/download/v1.2.0/lunarium-1.2.0-x86_64-linux-gnu.tar.gz"
-DEFAULT_LUNARIUM_PORT=44071
-DEFAULT_LUNARIUM_RPC_PORT=44072
-DEFAULT_LUNARIUM_USER="lunarium"
+CONFIG_FILE="1x2coin.conf"
+1X2COIN_DAEMON="/usr/local/bin/1x2coind"
+1X2COIN_CLI="/usr/local/bin/1x2coin-cli"
+1X2COIN_REPO="https://github.com/1x2-coin/1x2coin.git"
+1X2COIN_LATEST_RELEASE="https://github.com/1x2-coin/1x2coin/releases/download/v1.0.0/1x2coin-1.0.0-x86_64-linux-gnu.tar.gz"
+DEFAULT_1X2COIN_PORT=9214
+DEFAULT_1X2COIN_RPC_PORT=9213
+DEFAULT_1X2COIN_USER="1x2coin"
 NODE_IP=NotCheckedYet
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -104,43 +104,43 @@ clear
 
   echo -e "Clone git repo and compile it. This may take some time."
   cd $TMP_FOLDER
-  git clone $LUNARIUM_REPO lunarium
+  git clone $1X2COINREPO lunarium
   cd lunarium
   ./autogen.sh
   ./configure
   make
-  strip src/lunariumd src/lunarium-cli src/lunarium-tx
+  strip src/1x2coind src/1x2coin-cli src/1x2cointx
   make install
   cd ~
   rm -rf $TMP_FOLDER
   clear
 }
 
-function copy_lunarium_binaries(){
-  wget $LUNARIUM_LATEST_RELEASE >/dev/null
-  tar -xzf `basename $LUNARIUM_LATEST_RELEASE` --strip-components=2 >/dev/null
-  cp lunarium-cli lunariumd lunarium-tx lunarium-qt /usr/local/bin >/dev/null
-  chmod 755 /usr/local/bin/lunarium* >/dev/null
+function copy_1x2coin_binaries(){
+  wget $1X2COIN_LATEST_RELEASE >/dev/null
+  tar -xzf `basename $1X2COIN_LATEST_RELEASE` --strip-components=2 >/dev/null
+  cp 1x2coin-cli 1x2coind 1x2coin-tx 1x2coin-qt /usr/local/bin >/dev/null
+  chmod 755 /usr/local/bin/1x2coin* >/dev/null
   clear
 }
 
-function install_lunarium(){
-  echo -e "Installing Lunarium files."
+function install_1x2coin(){
+  echo -e "Installing 1x2coin files."
   echo -e "${GREEN}You have the choice between source code compilation (slower and requries 4G of RAM or VPS that allows swap to be added), or to use precompiled binaries instead (faster).${NC}"
   if [[ "no" == $(ask_yes_or_no "Do you want to perform source code compilation?") || \
         "no" == $(ask_yes_or_no "Are you **really** sure you want compile the source code, it will take a while?") ]]
   then
-    copy_lunarium_binaries
+    copy_1x2coin_binaries
     clear
   else
-    compile_lunarium
+    compile_1x2coin
     clear
   fi
 }
 
 function enable_firewall() {
-  echo -e "Installing fail2ban and setting up firewall to allow ingress on port ${GREEN}$LUNARIUM_PORT${NC}"
-  ufw allow $LUNARIUM_PORT/tcp comment "Lunarium MN port" >/dev/null
+  echo -e "Installing fail2ban and setting up firewall to allow ingress on port ${GREEN}$1X2COIN_PORT${NC}"
+  ufw allow $1X2COIN_PORT/tcp comment "1x2coin MN port" >/dev/null
   ufw allow ssh comment "SSH" >/dev/null 2>&1
   ufw limit ssh/tcp >/dev/null 2>&1
   ufw default allow outgoing >/dev/null 2>&1
@@ -149,17 +149,17 @@ function enable_firewall() {
   systemctl start fail2ban >/dev/null 2>&1
 }
 
-function systemd_lunarium() {
-  cat << EOF > /etc/systemd/system/$LUNARIUM_USER.service
+function systemd_1x2coin() {
+  cat << EOF > /etc/systemd/system/$1X2COIN_USER.service
 [Unit]
-Description=Lunarium service
+Description=1x2coin service
 After=network.target
 [Service]
-ExecStart=$LUNARIUM_DAEMON -conf=$LUNARIUM_FOLDER/$CONFIG_FILE -datadir=$LUNARIUM_FOLDER
-ExecStop=$LUNARIUM_CLI -conf=$LUNARIUM_FOLDER/$CONFIG_FILE -datadir=$LUNARIUM_FOLDER stop
+ExecStart=$1X2COIN_DAEMON -conf=$1X2COIN_FOLDER/$CONFIG_FILE -datadir=$1X2COIN_FOLDER
+ExecStop=$1X2COIN_CLI -conf=$1X2COIN_FOLDER/$CONFIG_FILE -datadir=$1X2COIN_FOLDER stop
 Restart=always
-User=$LUNARIUM_USER
-Group=$LUNARIUM_USER
+User=$1X2COIN_USER
+Group=$1X2COIN_USER
 
 [Install]
 WantedBy=multi-user.target
@@ -167,39 +167,39 @@ EOF
 
   systemctl daemon-reload
   sleep 3
-  systemctl start $LUNARIUM_USER.service
-  systemctl enable $LUNARIUM_USER.service
+  systemctl start $1X2COIN_USER.service
+  systemctl enable $1X2COIN_USER.service
 
-  if [[ -z "$(ps axo user:15,cmd:100 | egrep ^$LUNARIUM_USER | grep $LUNARIUM_DAEMON)" ]]; then
-    echo -e "${RED}lunariumd is not running${NC}, please investigate. You should start by running the following commands as root:"
-    echo -e "${GREEN}systemctl start $LUNARIUM_USER.service"
-    echo -e "systemctl status $LUNARIUM_USER.service"
+  if [[ -z "$(ps axo user:15,cmd:100 | egrep ^$1X2COIN_USER | grep $1X2COIN_DAEMON)" ]]; then
+    echo -e "${RED}1x2coind is not running${NC}, please investigate. You should start by running the following commands as root:"
+    echo -e "${GREEN}systemctl start $1X2COIN_USER.service"
+    echo -e "systemctl status $1X2COIN_USER.service"
     echo -e "less /var/log/syslog${NC}"
     exit 1
   fi
 }
 
 function ask_port() {
-read -p "LUNARIUM Port: " -i $DEFAULT_LUNARIUM_PORT -e LUNARIUM_PORT
-: ${LUNARIUM_PORT:=$DEFAULT_LUNARIUM_PORT}
+read -p "1X2COIN Port: " -i $DEFAULT_1X2COIN_PORT -e 1X2COIN_PORT
+: ${1X2COIN_PORT:=$DEFAULT_1X2COIN_PORT}
 }
 
 function ask_user() {
-  echo -e "${GREEN}The script will now setup Lunarium user and configuration directory. Press ENTER to accept defaults values.${NC}"
-  read -p "Lunarium user: " -i $DEFAULT_LUNARIUM_USER -e LUNARIUM_USER
-  : ${LUNARIUM_USER:=$DEFAULT_LUNARIUM_USER}
+  echo -e "${GREEN}The script will now setup 1x2coin user and configuration directory. Press ENTER to accept defaults values.${NC}"
+  read -p "1x2coin user: " -i $DEFAULT_1X2COIN_USER -e 1X2COIN_USER
+  : ${1X2COIN_USER:=$DEFAULT_LUNARIUM_USER}
 
-  if [ -z "$(getent passwd $LUNARIUM_USER)" ]; then
+  if [ -z "$(getent passwd $1X2COIN_USER)" ]; then
     USERPASS=$(pwgen -s 12 1)
-    useradd -m $LUNARIUM_USER
-    echo "$LUNARIUM_USER:$USERPASS" | chpasswd
+    useradd -m $1X2COIN_USER
+    echo "$1X2COIN_USER:$USERPASS" | chpasswd
 
-    LUNARIUM_HOME=$(sudo -H -u $LUNARIUM_USER bash -c 'echo $HOME')
+    1X2COIN_HOME=$(sudo -H -u $LUNARIUM_USER bash -c 'echo $HOME')
     DEFAULT_LUNARIUM_FOLDER="$LUNARIUM_HOME/.lunarium"
-    read -p "Configuration folder: " -i $DEFAULT_LUNARIUM_FOLDER -e LUNARIUM_FOLDER
-    : ${LUNARIUM_FOLDER:=$DEFAULT_LUNARIUM_FOLDER}
-    mkdir -p $LUNARIUM_FOLDER
-    chown -R $LUNARIUM_USER: $LUNARIUM_FOLDER >/dev/null
+    read -p "Configuration folder: " -i $DEFAULT_1X2COIN_FOLDER -e 1X2COIN_FOLDER
+    : ${LUNARIUM_FOLDER:=$DEFAULT_1X2COIN_FOLDER}
+    mkdir -p $1X2COIN_FOLDER
+    chown -R $1X2COIN_USER: $1X2COIN_FOLDER >/dev/null
   else
     clear
     echo -e "${RED}User exits. Please enter another username: ${NC}"
