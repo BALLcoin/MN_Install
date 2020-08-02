@@ -35,9 +35,9 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-if [ -n "$(pidof $LUNARIUM_DAEMON)" ] || [ -e "$LUNARIUM_DAEMON" ] ; then
+if [ -n "$(pidof $1X2COIN_DAEMON)" ] || [ -e "$1X2COIN_DAEMON" ] ; then
   echo -e "${GREEN}\c"
-  echo -e "Lunarium is already installed. Exiting..."
+  echo -e "1X2COIN is already installed. Exiting..."
   echo -e "{NC}"
   exit 1
 fi
@@ -45,7 +45,7 @@ fi
 
 function prepare_system() {
 
-echo -e "Prepare the system to install Lunarium master node."
+echo -e "Prepare the system to install 1X2COIN master node."
 apt-get update >/dev/null 2>&1
 DEBIAN_FRONTEND=noninteractive apt-get update > /dev/null 2>&1
 DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -qq upgrade >/dev/null 2>&1
@@ -81,7 +81,7 @@ function ask_yes_or_no() {
     esac
 }
 
-function compile_lunarium() {
+function compile_1x2coin() {
 echo -e "Checking if swap space is needed."
 PHYMEM=$(free -g|awk '/^Mem:/{print $2}')
 SWAP=$(free -g|awk '/^Swap:/{print $2}')
@@ -104,8 +104,8 @@ clear
 
   echo -e "Clone git repo and compile it. This may take some time."
   cd $TMP_FOLDER
-  git clone $1X2COINREPO lunarium
-  cd lunarium
+  git clone $1X2COINREPO 1x2coin
+  cd 1x2coin
   ./autogen.sh
   ./configure
   make
@@ -187,17 +187,17 @@ read -p "1X2COIN Port: " -i $DEFAULT_1X2COIN_PORT -e 1X2COIN_PORT
 function ask_user() {
   echo -e "${GREEN}The script will now setup 1x2coin user and configuration directory. Press ENTER to accept defaults values.${NC}"
   read -p "1x2coin user: " -i $DEFAULT_1X2COIN_USER -e 1X2COIN_USER
-  : ${1X2COIN_USER:=$DEFAULT_LUNARIUM_USER}
+  : ${1X2COIN_USER:=$DEFAULT_1X2COIN_USER}
 
   if [ -z "$(getent passwd $1X2COIN_USER)" ]; then
     USERPASS=$(pwgen -s 12 1)
     useradd -m $1X2COIN_USER
     echo "$1X2COIN_USER:$USERPASS" | chpasswd
 
-    1X2COIN_HOME=$(sudo -H -u $LUNARIUM_USER bash -c 'echo $HOME')
-    DEFAULT_LUNARIUM_FOLDER="$LUNARIUM_HOME/.lunarium"
+    1X2COIN_HOME=$(sudo -H -u $1X2COIN_USER bash -c 'echo $HOME')
+    DEFAULT_1X2COIN_FOLDER="$1X2COIN_HOME/.1x2coin"
     read -p "Configuration folder: " -i $DEFAULT_1X2COIN_FOLDER -e 1X2COIN_FOLDER
-    : ${LUNARIUM_FOLDER:=$DEFAULT_1X2COIN_FOLDER}
+    : ${1X2COIN_FOLDER:=$DEFAULT_1X2COIN_FOLDER}
     mkdir -p $1X2COIN_FOLDER
     chown -R $1X2COIN_USER: $1X2COIN_FOLDER >/dev/null
   else
@@ -212,7 +212,7 @@ function check_port() {
   PORTS=($(netstat -tnlp | awk '/LISTEN/ {print $4}' | awk -F":" '{print $NF}' | sort | uniq | tr '\r\n'  ' '))
   ask_port
 
-  while [[ ${PORTS[@]} =~ $LUNARIUM_PORT ]] || [[ ${PORTS[@]} =~ $[LUNARIUM_PORT+1] ]]; do
+  while [[ ${PORTS[@]} =~ $1X2COIN_PORT ]] || [[ ${PORTS[@]} =~ $[1X2COIN_PORT+1] ]]; do
     clear
     echo -e "${RED}Port in use, please choose another port:${NF}"
     ask_port
@@ -222,15 +222,15 @@ function check_port() {
 function create_config() {
   RPCUSER=$(pwgen -s 8 1)
   RPCPASSWORD=$(pwgen -s 15 1)
-  cat << EOF > $LUNARIUM_FOLDER/$CONFIG_FILE
+  cat << EOF > $1X2COIN_FOLDER/$CONFIG_FILE
 rpcuser=$RPCUSER
 rpcpassword=$RPCPASSWORD
 rpcallowip=127.0.0.1
-rpcport=$DEFAULT_LUNARIUM_RPC_PORT
+rpcport=$DEFAULT_1X2COIN_RPC_PORT
 listen=1
 server=1
 daemon=1
-port=$LUNARIUM_PORT
+port=$1X2COIN_PORT
 addnode=212.237.21.165
 addnode=212.237.8.42
 addnode=80.211.30.202
@@ -242,41 +242,41 @@ EOF
 
 function create_key() {
   echo -e "Enter your ${RED}Masternode Private Key${NC}. Leave it blank to generate a new ${RED}Masternode Private Key${NC} for you:"
-  read -e LUNARIUM_KEY
-  if [[ -z "$LUNARIUM_KEY" ]]; then
-  su $LUNARIUM_USER -c "$LUNARIUM_DAEMON -conf=$LUNARIUM_FOLDER/$CONFIG_FILE -datadir=$LUNARIUM_FOLDER -daemon"
+  read -e 1X2COIN_KEY
+  if [[ -z "$1X2COIN_KEY" ]]; then
+  su $1X2COIN_USER -c "$1X2COIN_DAEMON -conf=$1X2COIN_FOLDER/$CONFIG_FILE -datadir=$1X2COIN_FOLDER -daemon"
   sleep 15
-  if [ -z "$(ps axo user:15,cmd:100 | egrep ^$LUNARIUM_USER | grep $LUNARIUM_DAEMON)" ]; then
-   echo -e "${RED}Lunariumd server couldn't start. Check /var/log/syslog for errors.{$NC}"
+  if [ -z "$(ps axo user:15,cmd:100 | egrep ^$1X2COIN_USER | grep $1X2COIN_DAEMON)" ]; then
+   echo -e "${RED}1X2COINd server couldn't start. Check /var/log/syslog for errors.{$NC}"
    exit 1
   fi
-  LUNARIUM_KEY=$(su $LUNARIUM_USER -c "$LUNARIUM_CLI -conf=$LUNARIUM_FOLDER/$CONFIG_FILE -datadir=$LUNARIUM_FOLDER masternode genkey")
-  su $LUNARIUM_USER -c "$LUNARIUM_CLI -conf=$LUNARIUM_FOLDER/$CONFIG_FILE -datadir=$LUNARIUM_FOLDER stop"
+  1X2COIN_KEY=$(su $1X2COIN_USER -c "$1X2COIN_CLI -conf=$1X2COIN_FOLDER/$CONFIG_FILE -datadir=$1X2COIN_FOLDER masternode genkey")
+  su $1X2COIN_USER -c "$1X2COIN_CLI -conf=$1X2COIN_FOLDER/$CONFIG_FILE -datadir=$1X2COIN_FOLDER stop"
 fi
 }
 
 function update_config() {
-  sed -i 's/daemon=1/daemon=0/' $LUNARIUM_FOLDER/$CONFIG_FILE
-  cat << EOF >> $LUNARIUM_FOLDER/$CONFIG_FILE
+  sed -i 's/daemon=1/daemon=0/' $1X2COIN_FOLDER/$CONFIG_FILE
+  cat << EOF >> $1X2COIN_FOLDER/$CONFIG_FILE
 maxconnections=256
 masternode=1
-masternodeaddr=$NODE_IP:$LUNARIUM_PORT
-masternodeprivkey=$LUNARIUM_KEY
+masternodeaddr=$NODE_IP:$1X2COIN_PORT
+masternodeprivkey=$1X2COIN_KEY
 EOF
-  chown -R $LUNARIUM_USER: $LUNARIUM_FOLDER >/dev/null
+  chown -R $1X2COIN_USER: $1X2COIN_FOLDER >/dev/null
 }
 
 function important_information() {
  echo
  echo -e "================================================================================================================================"
- echo -e "Lunarium Masternode is up and running as user ${GREEN}$LUNARIUM_USER${NC} and it is listening on port ${GREEN}$LUNARIUM_PORT${NC}."
- echo -e "${GREEN}$LUNARIUM_USER${NC} password is ${RED}$USERPASS${NC}"
- echo -e "Configuration file is: ${RED}$LUNARIUM_FOLDER/$CONFIG_FILE${NC}"
- echo -e "Start: ${RED}systemctl start $LUNARIUM_USER.service${NC}"
- echo -e "Stop: ${RED}systemctl stop $LUNARIUM_USER.service${NC}"
- echo -e "VPS_IP:PORT ${RED}$NODE_IP:$LUNARIUM_PORT${NC}"
- echo -e "MASTERNODE PRIVATEKEY is: ${RED}$LUNARIUM_KEY${NC}"
- echo -e "Please check Lunarium is running with the following command: ${GREEN}systemctl status $LUNARIUM_USER.service${NC}"
+ echo -e "1X2COIN Masternode is up and running as user ${GREEN}$1X2COIN_USER${NC} and it is listening on port ${GREEN}$1X2COIN_PORT${NC}."
+ echo -e "${GREEN}$1X2COIN_USER${NC} password is ${RED}$USERPASS${NC}"
+ echo -e "Configuration file is: ${RED}$1X2COIN_FOLDER/$CONFIG_FILE${NC}"
+ echo -e "Start: ${RED}systemctl start $1X2COIN_USER.service${NC}"
+ echo -e "Stop: ${RED}systemctl stop $1X2COIN_USER.service${NC}"
+ echo -e "VPS_IP:PORT ${RED}$NODE_IP:$1X2COIN_PORT${NC}"
+ echo -e "MASTERNODE PRIVATEKEY is: ${RED}$1X2COIN_KEY${NC}"
+ echo -e "Please check 1X2COIN is running with the following command: ${GREEN}systemctl status $1X2COIN_USER.service${NC}"
  echo -e "================================================================================================================================"
 }
 
@@ -287,7 +287,7 @@ function setup_node() {
   create_key
   update_config
   enable_firewall
-  systemd_lunarium
+  systemd_1x2coin
   important_information
 }
 
@@ -296,5 +296,5 @@ function setup_node() {
 clear
 checks
 prepare_system
-install_lunarium
+install_1x2coin
 setup_node

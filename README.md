@@ -40,7 +40,7 @@ After the MN is up and running, you need to configure the desktop wallet accordi
 For security reasons **1x2coin** is installed under **1x2coin** user, hence you need to **su 1x2coin** before checking:    
 
 ```
-If not installed using default username lunarium, please replace lunarium with your actual username.   
+If not installed using default username 1x2coin, please replace 1x2coin with your actual username.   
 
 su 1x2coin  
 1x2coin-cli masternode status  
@@ -52,8 +52,8 @@ Also, if you want to check/start/stop **1x2coin**, run one of the following comm
 
 ```
 systemctl status 1x2coin #To check the service is running.  
-systemctl start 1x2coin.service #To start Lunarium service.  
-systemctl stop 1x2coin.service #To stop Lunarium service.  
+systemctl start 1x2coin.service #To start 1X2COIN service.  
+systemctl stop 1x2coin.service #To stop 1X2COIN service.  
 systemctl is-enabled 1x2coin #To check whetether 1x2coin service is enabled on boot or not.  
 ```  
 
