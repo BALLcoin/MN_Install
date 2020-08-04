@@ -288,7 +288,7 @@ function setup_node() {
   update_config
 
   # firewall setup should be optional
-  if [[ "yes" == $(ask_yes_or_no "Do you want to perform source code compilation?") ]]
+  if [[ "yes" == $(ask_yes_or_no "Do you want to setup the local firewall (choose yes if this host is on a public ip address)?") ]]
   then
     enable_firewall
   fi
