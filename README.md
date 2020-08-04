@@ -5,7 +5,7 @@ Shell script to install an [1x2coin Masternode](http://www.1x2-coin.net/) on a L
 ## Installation:  
 
 * wget -q https://raw.githubusercontent.com/1x2-coin/MN_Install/master/1x2coin_install.sh
-* bash 1x2coin_install.sh.sh
+* bash 1x2coin_install.sh
 
 ***
 
