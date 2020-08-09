@@ -1,16 +1,17 @@
 #!/bin/bash
-VERSION="0.0.1"
+VERSION="0.0.2"
+# 0.0.1 - minor cleanup, fix variable names
+# 0.0.2 - add ability to install on 18.04; change def user to 'onebytwo'
 
 TMP_FOLDER=$(mktemp -d)
 CONFIG_FILE="1x2coin.conf"
 ONEX2COIN_DAEMON="/usr/local/bin/1x2coind"
 ONEX2COIN_CLI="/usr/local/bin/1x2coin-cli"
 ONEX2COIN_REPO="https://github.com/1x2-coin/1x2coin.git"
-#ONEX2COIN_LATEST_RELEASE="https://github.com/1x2-coin/1x2coin/releases/download/v1.0.0/1x2coin-1.0.0-x86_64-linux-gnu.tar.gz"
 ONEX2COIN_LATEST_RELEASE="https://github.com/1x2-coin/1x2coin/releases/download/v1.0.0/linux-1x2-coin-1.0.0.zip"
 DEFAULT_ONEX2COIN_PORT=9214
 DEFAULT_ONEX2COIN_RPC_PORT=9213
-DEFAULT_ONEX2COIN_USER="1x2coin"
+DEFAULT_ONEX2COIN_USER="onebytwo"
 NODE_IP=NotCheckedYet
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -25,10 +26,9 @@ function compile_error() {
   fi
 }
 
-
 function checks() {
-  if [[ $(lsb_release -d) != *16.04* ]]; then
-    echo -e "${RED}You are not running Ubuntu 16.04. Installation is cancelled.${NC}"
+  if [[ $(lsb_release -d) != *16.04* ]] && [[ $(lsb_release -d) != *18.04* ]]; then
+    echo -e "${RED}You are not running Ubuntu 16.04 or 18.04. Installation is cancelled.${NC}"
     exit 1
   fi
 
@@ -39,7 +39,7 @@ function checks() {
 
   if [ -n "$(pidof $ONEX2COIN_DAEMON)" ] || [ -e "$ONEX2COIN_DAEMON" ] ; then
     echo -e "${GREEN}\c"
-    echo -e "1X2COIN is already installed. Exiting...${NC}"
+    echo -e "1X2COIN is already installed (bin files found in /usr/local/bin). Exiting...${NC}"
     exit 1
   fi
 }
@@ -180,7 +180,7 @@ EOF
 }
 
 function ask_port() {
-  read -p "1X2COIN Port: " -i $DEFAULT_ONEX2COIN_PORT -e ONEX2COIN_PORT
+  read -p "1X2COIN Port (note that windows client will not work with non-std port!): " -i $DEFAULT_ONEX2COIN_PORT -e ONEX2COIN_PORT
   : ${ONEX2COIN_PORT:=$DEFAULT_ONEX2COIN_PORT}
 }
 
@@ -237,6 +237,15 @@ addnode=80.211.30.202
 addnode=80.211.83.188
 addnode=80.211.74.34
 addnode=212.237.24.82
+addnode=167.71.174.90
+addnode=134.209.88.160
+addnode=159.69.193.148
+addnode=173.249.38.57
+addnode=192.99.247.109
+addnode=45.63.41.115
+addnode=144.91.70.202
+addnode=207.180.194.55
+addnode=140.82.55.20
 EOF
 }
 
@@ -301,6 +310,12 @@ function setup_node() {
 ##### Main #####
 clear
 echo -e "${GREEN}1x2 MasterNode Installer (v${VERSION}) ${NC}"
+
+# make sure user meant to run this!
+if [[ "no" == $(ask_yes_or_no "You are about to install 1x2 masternod, continue?") ]]
+then
+  exit 1
+fi
 
 checks
 prepare_system
