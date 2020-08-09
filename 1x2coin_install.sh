@@ -17,7 +17,6 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
-
 function compile_error() {
   if [ "$?" -gt "0" ];
    then
@@ -39,7 +38,7 @@ function checks() {
 
   if [ -n "$(pidof $ONEX2COIN_DAEMON)" ] || [ -e "$ONEX2COIN_DAEMON" ] ; then
     echo -e "${GREEN}\c"
-    echo -e "1X2COIN is already installed (bin files found in /usr/local/bin). Exiting...${NC}"
+    echo -e "1X2COIN is already installed. Exiting...${NC}"
     exit 1
   fi
 }
@@ -179,10 +178,11 @@ EOF
   fi
 }
 
-function ask_port() {
-  read -p "1X2COIN Port (note that windows client will not work with non-std port!): " -i $DEFAULT_ONEX2COIN_PORT -e ONEX2COIN_PORT
-  : ${ONEX2COIN_PORT:=$DEFAULT_ONEX2COIN_PORT}
-}
+# daemon doesn't work on alternate ports
+#function ask_port() {
+#  read -p "1X2COIN Port (note that windows client will not work with non-std port!): " -i $DEFAULT_ONEX2COIN_PORT -e ONEX2COIN_PORT
+#  : ${ONEX2COIN_PORT:=$DEFAULT_ONEX2COIN_PORT}
+#}
 
 function ask_user() {
   echo -e "${GREEN}The script will now setup 1x2coin user and configuration directory. Press ENTER to accept defaults values.${NC}"
