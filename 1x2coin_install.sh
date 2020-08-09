@@ -311,7 +311,7 @@ clear
 echo -e "${GREEN}1x2 MasterNode Installer (v${VERSION}) ${NC}"
 
 # make sure user meant to run this!
-if [[ "no" == $(ask_yes_or_no "You are about to install 1x2 masternod, continue?") ]]
+if [[ "no" == $(ask_yes_or_no "You are about to install 1x2 masternode, continue?") ]]
 then
   exit 1
 fi
