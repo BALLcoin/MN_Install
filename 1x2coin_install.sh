@@ -9,7 +9,7 @@ ONEX2COIN_DAEMON="/usr/local/bin/1x2coind"
 ONEX2COIN_CLI="/usr/local/bin/1x2coin-cli"
 ONEX2COIN_REPO="https://github.com/1x2-coin/1x2coin.git"
 ONEX2COIN_LATEST_RELEASE="https://github.com/1x2-coin/1x2coin/releases/download/v1.0.0/linux-1x2-coin-1.0.0.zip"
-DEFAULT_ONEX2COIN_PORT=9214
+ONEX2COIN_PORT=9214
 DEFAULT_ONEX2COIN_RPC_PORT=9213
 DEFAULT_ONEX2COIN_USER="onebytwo"
 NODE_IP=NotCheckedYet
@@ -44,16 +44,16 @@ function checks() {
 }
 
 function prepare_system() {
-  echo -e "Prepare the system to install 1X2COIN master node."
+  echo -e "Prepare the system to install 1X2COIN master node..."
   apt-get update >/dev/null 2>&1
   DEBIAN_FRONTEND=noninteractive apt-get update > /dev/null 2>&1
   DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" -y -qq upgrade >/dev/null 2>&1
   apt install -y software-properties-common >/dev/null 2>&1
 
-  echo -e "${GREEN}Adding bitcoin PPA repository"
+  echo -e "${GREEN}Adding bitcoin PPA repository..."
   apt-add-repository -y ppa:bitcoin/bitcoin >/dev/null 2>&1
 
-  echo -e "Installing required packages, it may take some time to finish.${NC}"
+  echo -e "Installing required packages, it may take some time to finish...${NC}"
   apt-get update >/dev/null 2>&1
   apt-get upgrade >/dev/null 2>&1
   apt-get install -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" git make build-essential libtool automake autotools-dev autoconf pkg-config libssl-dev libevent-dev libdb4.8-dev libdb4.8++-dev libminiupnpc-dev libboost-all-dev ufw fail2ban pwgen curl>/dev/null 2>&1
@@ -98,7 +98,6 @@ function compile_1x2coin() {
   else
     echo -e "${GREEN}Server running with at least 4G of RAM, no swap needed.${NC}"
   fi
-  clear
 
   echo -e "Clone git repo and compile it. This may take some time."
   cd $TMP_FOLDER
@@ -120,20 +119,17 @@ function copy_1x2coin_binaries(){
 #  cp 1x2coin-cli 1x2coind 1x2coin-tx 1x2coin-qt /usr/local/bin >/dev/null
   unzip `basename $ONEX2COIN_LATEST_RELEASE` -d /usr/local/bin >/dev/nul
   chmod 755 /usr/local/bin/1x2coin* >/dev/null
-  clear
 }
 
 function install_1x2coin(){
-  echo -e "Installing 1x2coin files."
+  echo -e "Installing 1x2coin files..."
   echo -e "${GREEN}You have the choice between source code compilation (slower and requries 4G of RAM or VPS that allows swap to be added), or to use precompiled binaries instead (faster).${NC}"
   if [[ "no" == $(ask_yes_or_no "Do you want to perform source code compilation?") || \
         "no" == $(ask_yes_or_no "Are you **really** sure you want compile the source code, it will take a while?") ]]
   then
     copy_1x2coin_binaries
-    clear
   else
     compile_1x2coin
-    clear
   fi
 }
 
@@ -149,6 +145,7 @@ function enable_firewall() {
 }
 
 function systemd_1x2coin() {
+  echo -e "Setting up and starting 1x2coin service..."
   cat << EOF > /etc/systemd/system/$ONEX2COIN_USER.service
 [Unit]
 Description=1x2coin service
@@ -211,11 +208,10 @@ function check_port() {
   declare -a PORTS
   PORTS=($(netstat -tnlp | awk '/LISTEN/ {print $4}' | awk -F":" '{print $NF}' | sort | uniq | tr '\r\n'  ' '))
 
-  while [[ ${PORTS[@]} =~ $ONEX2COIN_PORT ]] || [[ ${PORTS[@]} =~ $[ONEX2COIN_PORT+1] ]]; do
-    clear
+  if [[ ${PORTS[@]} =~ $ONEX2COIN_PORT ]] || [[ ${PORTS[@]} =~ $[ONEX2COIN_PORT+1] ]]; then
     echo -e "${RED}Port in use, please choose another port:${NF}"
-    ask_port
-  done
+    exit 1
+  fi
 }
 
 function create_config() {
