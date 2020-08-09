@@ -210,7 +210,6 @@ function ask_user() {
 function check_port() {
   declare -a PORTS
   PORTS=($(netstat -tnlp | awk '/LISTEN/ {print $4}' | awk -F":" '{print $NF}' | sort | uniq | tr '\r\n'  ' '))
-  ask_port
 
   while [[ ${PORTS[@]} =~ $ONEX2COIN_PORT ]] || [[ ${PORTS[@]} =~ $[ONEX2COIN_PORT+1] ]]; do
     clear
