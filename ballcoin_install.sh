@@ -118,7 +118,7 @@ clear
 
 function copy_ballcoin_binaries(){
   wget $ballcoin_LATEST_RELEASE >/dev/null
-  unzip `basename $ballcoin_LATEST_RELEASE`   >/dev/null
+  unzip -j `basename $ballcoin_LATEST_RELEASE`   >/dev/null
   cp ballcoin-cli ballcoind ballcoin-tx ballcoin-qt /usr/local/bin >/dev/null
   chmod 755 /usr/local/bin/ballcoin* >/dev/null
   clear
