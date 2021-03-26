@@ -66,7 +66,7 @@ if [ "$?" -gt "0" ];
     echo "apt -y install software-properties-common"
     echo "apt-add-repository -y ppa:bitcoin/bitcoin"
     echo "apt-get update"
-    echo "apt install -y net-tools unzip  git make build-essential libtool automake autotools-dev autoconf pkg-config libssl-dev libevent-dev libdb4.8-dev libdb4.8++-dev libminiupnpc-dev libboost-all-dev"
+    echo "apt install -y net-tools unzip  git make build-essential libtool automake autotools-dev autoconf pkg-config libssl1.0-dev libgmp-dev libevent-dev libdb4.8-dev libdb4.8++-dev libminiupnpc-dev libboost-all-dev"
     exit 1
 fi
 clear
