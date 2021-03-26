@@ -9,6 +9,13 @@ Shell script to install an [BALLcoin Masternode](http://www.ball-coin.com/) on a
 
 ***
 
+Tested and working on
+
+[Lineode](https://www.linode.com/?r=f37c31cc9eb2233aafdf4c9b7e36c91b6315f5ee)
+
+[DigitalOcean](https://m.do.co/c/f414b0f1870e)
+
+
 ## Desktop wallet setup  
 
 After the MN is up and running, you need to configure the desktop wallet accordingly. Here are the steps:  
