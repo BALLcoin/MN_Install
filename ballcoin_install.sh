@@ -104,7 +104,7 @@ clear
 
   echo -e "Clone git repo and compile it. This may take some time."
   cd $TMP_FOLDER
-  git clone $ballcoinREPO ballcoin
+  git clone $ballcoin_REPO ballcoin
   cd ballcoin
   ./autogen.sh
   ./configure
