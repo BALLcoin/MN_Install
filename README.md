@@ -12,9 +12,10 @@ Shell script to install an [BALLcoin Masternode](http://www.ball-coin.com/) on a
 
 Tested and working on
 
-[Lineode](https://www.linode.com/?r=f37c31cc9eb2233aafdf4c9b7e36c91b6315f5ee)
-
+[Lineode](https://www.linode.com/?r=f37c31cc9eb2233aafdf4c9b7e36c91b6315f5ee) 
+  [Test File](https://raw.githubusercontent.com/BALLcoin/MN_Install/master/Tests/linnode-debug.zip) 
 [DigitalOcean](https://m.do.co/c/f414b0f1870e)
+  [Test File](https://raw.githubusercontent.com/BALLcoin/MN_Install/master/Tests/digitalocean-debug.zip) 
 
 
 ## Desktop wallet setup  
