@@ -109,7 +109,7 @@ clear
   ./autogen.sh
   ./configure
   make
-  strip src/ballcoind src/ballcoin-cli src/ballcointx
+  strip src/ballcoind src/ballcoin-cli src/ballcoin-tx
   make install
   cd ~
   rm -rf $TMP_FOLDER
