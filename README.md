@@ -14,10 +14,15 @@ Tested and working on
 
 [Lineode](https://www.linode.com/?r=f37c31cc9eb2233aafdf4c9b7e36c91b6315f5ee) 
 [Test File](https://raw.githubusercontent.com/BALLcoin/MN_Install/master/Tests/linnode-debug.zip) 
+Service Start: 09:59:15
+Sync Complete: 10:46:59
+Blocks: 295581 
 
 [DigitalOcean](https://m.do.co/c/f414b0f1870e)
 [Test File](https://raw.githubusercontent.com/BALLcoin/MN_Install/master/Tests/digitalocean-debug.zip) 
-
+Service Start: 10:02:05
+Sync Complete: 10:28:20
+Blocks: 295581 
 
 ## Desktop wallet setup  
 
