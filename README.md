@@ -8,6 +8,7 @@ Shell script to install an [BALLcoin Masternode](http://www.ball-coin.com/) on a
 * bash ballcoin_install.sh
 
 ***
+## MN Host Providers: 
 
 Tested and working on
 
